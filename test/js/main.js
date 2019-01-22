@@ -39,9 +39,23 @@ class Map {
 
 /************************ CHARS *************************/
 
-/*
-drawPlayer() {
+var bouncer = new Player(2, 1, "./imgs/190122_bouncer_chars_bouncer_left_test.png", 100, 100, "./imgs/190122_bouncer_chars_bouncer_right_test.png", 100, 100, "./imgs/190122_bouncer_chars_bouncer_front_test.png", 100, 100)
 
+/*
+bouncer.drawFront()
+*/
+
+var img = new Image()
+img.src = './imgs/190122_bouncer_chars_bouncer_front_test.png'
+ctx.drawImage(img, 200, 100, 100, 100)
+
+
+/************************ DRAWING *************************/
+
+/*
+function drawPlayer(player) {
+  ctx.drawImage
+  player.
 }
 */
 

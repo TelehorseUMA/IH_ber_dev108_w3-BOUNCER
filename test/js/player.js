@@ -1,5 +1,5 @@
 class Player {
-  constructor(x, y, imgLeft, imgRight, imgFront) {
+  constructor(x, y, imgLeft, imgLeftW, imgLeftH, imgRight, imgRightW, imgRightH, imgFront, imgFrontW, imgFrontH) {
     this.x = x 
     this.y = y
     // this.img = new Image()
@@ -7,10 +7,16 @@ class Player {
     //  can I integrate all the necessary pictures in the class? how?
     this.imgLeft = new Image()
     this.imgLeft.src = imgLeft
+    this.imgLeftW = imgLeftW
+    this.imgLeftH = imgLeftH
     this.imgRight = new Image()
     this.imgRight.src = imgRight
+    this.imgRightW = imgRightW
+    this.imgRightH = imgRightH
     this.imgFront = new Image()
     this.imgFront.src = imgFront
+    this.imgFrontW = imgFrontW
+    this.imgFrontH = imgFrontH
   }
 
 /*  This should be moved into a createGame() function, which creates a newMap, sets initial stats and initializes the player + NPCs
@@ -50,25 +56,25 @@ class Player {
   }
 
 moveLeft() {
-  this.x -= gridWidth
+  this.x--
 }
 
 moveRight() {
-  this.x += gridWidth
+  this.x++
 }
 
-drawRight(img) {
-  ctx.drawImage(this.imgRight, this.x, this.y, imgRightW, imgRightH)
+drawRight(imgRightW, imgRightH) {
+  ctx.drawImage(this.imgRight, this.x*100, this.y*100, imgRightW, imgRightH)
 }
 //  * does ctx have to be defined in this file or can it be stored in another file?
 //  * should draw method instead be stored in main.js (where ctx is stored)? 
 
-drawLeft(img) {
+drawLeft(imgLeftW, imgLeftH) {
   ctx.drawImage(this.imgLeft, this.x, this.y, imgLeftW, imgLeftH)
 }
 
-drawFront(img) {
-  ctx.drawImage(this.imgFront, this.x, this.y, imgFrontW, imgFrontH)
+drawFront(imgFrontW, imgFrontH) {
+  ctx.drawImage(this.imgFront, this.x*100, this.y*100, imgFrontW, imgFrontH)
 }
 
 /*
@@ -92,6 +98,7 @@ document.onkeydown = function(e) {
 }
 */
 
+/*
 removeNPC(line, NPC) {  //  This is used to let the NPC in as well as send it away. Difference between both actions is only marked by the animation triggered.
   line.dequeue(NPC)
 }

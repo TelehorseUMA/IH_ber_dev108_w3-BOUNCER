@@ -16,10 +16,8 @@ class NPC {
   }
 }
 
-var bouncer = new Character()
-//  there needs to be only one instance of this character; should it have its own class?
-
-var guest = new Character()
+/*
+var guest = new NPC ()
 //  needs to have property desirable: true/false
 //  needs to have property queue: number, to determine which queue the character appears in
 //  extends class 
@@ -27,5 +25,4 @@ var guest = new Character()
 
 
 //  Where to put the mechnics of the queues? New class?
-
-
+*/
