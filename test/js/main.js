@@ -3,7 +3,6 @@ ctx = canvas.getContext('2d')
 
 /************************ GAME BOARD *************************/
 //  1.  simple map for test purposese
-//  2.  write create map function that will create maps according to pre-defined rules and inputs           to generate different levels
 
 gameBoard = [
   [ , , , , ],
@@ -25,6 +24,18 @@ function drawBoard(twoDimArray) {
 
 drawBoard(gameBoard)
 
+//  2.  write create map function that will create maps according to pre-defined rules and inputs to generate different levels
+//      =>  the gameBoard is always conceptualized in terms of a 2d array; indeces are mapped to the canvas by the drawBoard function
+//      =>  player and NPC positions are also given as indeces and mapped onto the canvas by respective functions
+
+class Map {
+  constructor (tileSize, boardWidth, boardHeight) {
+    this.tileSize = tileSize
+    this.boardWidth = boardWidth
+    this.boardHeigt = boardHeight
+  }
+
+}
 
 /************************ CHARS *************************/
 
@@ -55,3 +66,9 @@ var stats = {
   cash: 0,
   time: 0, // 0 = 11pm; end of party might vary to increase difficulty
 }
+
+
+/************************ GAME CONTROL *************************/
+
+//  * initialize the game
+//  * trigger events: player winning / player losing 
