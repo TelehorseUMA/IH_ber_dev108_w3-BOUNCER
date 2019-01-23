@@ -1,10 +1,23 @@
-class Player {
-  constructor(x, y, imgLeft, imgLeftW, imgLeftH, imgRight, imgRightW, imgRightH, imgFront, imgFrontW, imgFrontH) {
-    this.x = x 
-    this.y = y
-    // this.img = new Image()
-    // this.img.src = img
-    //  can I integrate all the necessary pictures in the class? how?
+class Bouncer {
+  constructor(initialX, initialY, imgPaths, tileSize) {
+    this.x = initialX 
+    this.y = initialY
+    this.view = 'front'
+    this.score = 0
+    this.reputation = 0
+    this.cash = 0
+    this.imgW = tileSize-10
+    this.imgH = tileSize-10
+    this.imgs = {}  
+    for (var view in imgPaths) {
+      this.imgs[view] = new Image()
+      this.imgs[view].src = imgPaths[view]
+    }
+    this.xOnC = this.x*tileSize
+    this.yOnC = this.y*tileSize
+    this.ctx = ctx
+  }
+    /*
     this.imgLeft = new Image()
     this.imgLeft.src = imgLeft
     this.imgLeftW = imgLeftW
@@ -17,7 +30,7 @@ class Player {
     this.imgFront.src = imgFront
     this.imgFrontW = imgFrontW
     this.imgFrontH = imgFrontH
-  }
+    */
 
 /*  This should be moved into a createGame() function, which creates a newMap, sets initial stats and initializes the player + NPCs
 
@@ -27,55 +40,19 @@ class Player {
   }
 */
 
-  movePlayer() {
-    //  only moves on x-axis
-    document.onkeydown = function(e) {
-      e.preventDefault()
-      switch(e.keyCode) {
-        case 37:  //  keydown keycode right cursor
-        this.moveLeft()
-        this.drawLeft() //  draw img bouncer left
-        break
-        case 39:  // keydown keycode left cursor
-        this.moveRight()
-        this.drawRight()  //  draw img bouncer right
-        break 
-      }
-    }
-    document.onkeyup = function(e) {
-      e.preventDefault()
-      switch(e.keyCode) {
-        case 37:
-        this.drawFront()  // switch back to img bouncer front
-        break
-        case 39:
-        this.drawFront()  // switch back to img bouncer front
-        break
-      }
-    }
+  moveLeft() {
+    this.x-- 
+    this.view = 'left'
   }
 
-moveLeft() {
-  this.x--
-}
+  moveRight() {
+    this.x++
+    this.view = 'right'
+  }
 
-moveRight() {
-  this.x++
-}
-
-drawRight(imgRightW, imgRightH) {
-  ctx.drawImage(this.imgRight, this.x*100, this.y*100, imgRightW, imgRightH)
-}
-//  * does ctx have to be defined in this file or can it be stored in another file?
-//  * should draw method instead be stored in main.js (where ctx is stored)? 
-
-drawLeft(imgLeftW, imgLeftH) {
-  ctx.drawImage(this.imgLeft, this.x, this.y, imgLeftW, imgLeftH)
-}
-
-drawFront(imgFrontW, imgFrontH) {
-  ctx.drawImage(this.imgFront, this.x*100, this.y*100, imgFrontW, imgFrontH)
-}
+  draw(){
+    ctx.drawImage(this.imgs[this.view], this.xOnC, this.yOnC, this.imgW, this.imgH)
+  }
 
 /*
 playerActions() {
