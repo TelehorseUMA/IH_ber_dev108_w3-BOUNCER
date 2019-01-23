@@ -8,16 +8,6 @@ class Guest {
     this.img.src = imgPath
     this.desirable = bool
   }
-
-  moveGuest() {
-    //  only moves on y-axis
-    //  decide on interval --> this might better be defined inside the line class
-    setInterval()
-  }
-
-  pushGuest() {
-    //  pushes an NPC into the bottom of the queue
-  }
 }
 
 /*

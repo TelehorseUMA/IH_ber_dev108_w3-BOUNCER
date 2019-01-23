@@ -31,20 +31,31 @@ drawBoard(gameBoard)
 
 /************************ CHARS *************************/
 
+//  PLAYER
+
 var player = new Bouncer(2, 1, {
   front:  '../imgs/bouncer_front.png',
   left:   '../imgs/bouncer_left.png',
   right: '../imgs/bouncer_right.png',
-  },tileSize)
+},tileSize)
 
+//  NPCs  
+var guestArray = []
+var punkgirl = new Guest(0, 0, '../imgs/guest_punkgirl.png', true)
+guestArray.push(punkgirl)
+var gayguy = new Guest(0, 0, '../imgs/guest_gayguy.png', true)
+guestArray.push(gayguy)
+var businessman = new Guest(0, 0, '../imgs/guest_businessman.png',false)
+guestArray.push(businessman)
 
-  
-  //  CREATE guests (new NPC) here
-  //  put guests in guestArray
-  var punkgirl = new Guest(0, 0, '../imgs/guest_punkgirl.png', true)
-  var gayguy = new Guest(0, 0, '../imgs/guest_gayguy.png', true)
-  var businessman = new Guest(0, 0, '../imgs/guest_businessman.png', false)
+//  EMPTY LINE ELEMENT
+var empty = ''
+guestArray.push(empty)
 
+/************************ LINES *************************/
+var regLine = new Line(5, 5000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true)
+
+regLine.update()
 
 /************************ DRAWING *************************/
 

@@ -27,6 +27,7 @@ class Map {
     */
     drawBoard(gameBoard)  
     player.draw()
+    regLine.draw()
     // TODO: for each queue, draw the queue
   }
 

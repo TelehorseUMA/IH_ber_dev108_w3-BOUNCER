@@ -46,19 +46,22 @@ implement queue logic for the lines
 */
 
 class Line {
-  constructor(maxLen, rfRate, repLossTr, repLossRate, repLossVal, maxWait, genNpcRate, queueControl = [], lineIndex, lineType, folEmpty = false) {
+  constructor(maxLen, updateRate, repLossNr, repLossRate, repLossVal, maxWait, genNpcRate, queueControl = [], lineIndex, lineType, folEmpty = true) {
     this.maxLen = maxLen  //  max number of NPCs in line; otherwise queue overflow => player loses
-    this.rfRate = rfRate  //  interval after which NPCs move up one position in the line; random function triggered to determine whether a new NPC will be pushed into bottom of the line; raise to increase difficulty (higher levels: higher initial refresh rate, refresh rate might rise during level)
-    this.repLossTr = repLossTr // treshold of number of guests in the line; if crossed player loses reputation
-    this.repLossRate = repLossRate // rate at which player's reputation is decreased if certain conditions are met (repLossTr reached; etc.)
-    this.repLossVal = repLossVal // amount of reputation player loses at repLossRate if certain conditions are met
+    this.queueControl = queueControl // stores NPCs in line; default is empty, but can be initialized with NPCs already in line
+    this.updateRate = updateRate  // interval after which NPCs move up one position in the line; random function triggered to determine whether a new NPC will be pushed into bottom of the line; raise to increase difficulty (higher levels: higher initial update rate, update rate might rise during level)
+    this.repLossNr = repLossNr // treshold of number of guests in the line; if crossed player loses reputation
+    this.repLossRate = repLossRate // interval of reputation loss  once conditions are met (repLossTr reached; etc.)
+    this.repLossVal = repLossVal // amount of reputation player loses at repLossRate once conditions are met
     this.maxWait = maxWait // wait time of NPCs in line after which player loses rep
     this.genNpcRate = genNpcRate // probability of new NPCs appearing in line
-    this.queueControl = queueControl // stores NPCs in line; default is empty, but can be initialized with NPCs already in line
     this.lineIndex = lineIndex // lines should be automatically numbered depending on how many lines there are on the map
+    this.xOnC = lineIndex * tileSize
     this.lineType = lineType // line type determines some of the other properties
-    this.frontOfLine.y = tileSize * 3 // must be moved to main.js, bc. tileSize is only defined there
+    /*
+    this.folY =  // must be moved to main.js, bc. tileSize is only defined there
     this.frontOfLine.x = tileSize * (colNum - 2)
+    */
     this.folEmpty = folEmpty
   }
   
@@ -75,6 +78,7 @@ class Line {
       return true
     } else {
       return false
+      //  write method to check at regular intervals if this is false; if so: "GAME OVER"
     }
   }
 
@@ -86,29 +90,74 @@ class Line {
     }
   }
 
-  enqueue(NPC) {  
+  enqueue(e) {  
     if (this.canEnqueue() === false) {
       return 'Queue Overflow' //  this must be used in a game control function to end the game and display 'you lose' info
     } else {
-    this.queueControl.unshift(NPC)
+    this.queueControl.unshift(e)
     return this.queueControl
     }
   }
 
-  dequeue(NPC) {  //  =>  is triggered in two instances: 1. player lets guest in / 2. player turns guest away
+  dequeue(e) {  //  =>  is triggered in two instances: 1. player lets guest in / 2. player turns guest away
     if (this.isEmpty() === true) {
-      return 'Queue Underflow'  //  might be triggered when player moves to an empty line and hits let in/turn away button; does however not trigger any event ingame
+      return 'Queue Underflow'  
+      //  might be triggered when player moves to an empty line and hits let in/turn away button; does however not trigger any event ingame
     } else if (this.folEmpty === false && this.lineIndex === player.x) {
-      return this.queueControl.pop(NPC) //  NPC in line position one is removed from line; depending on button press either turn away or let in animation triggered 
+      return this.queueControl.pop(e) 
+      //  NPC in line position one is removed from line; depending on button press either turn away or let in animation triggered 
     }
   }
 
+  update() {
+    //  use setInterval to retrigger according to line's updateRate
+    //  use rndGuest to randomly select guest or empty string from guest array
+    //  use enqueue to unshift guest into line
+    //  if enqueue returns Queue overflow => GAME OVER (clear             interval; halt movements; display GAME OVER Screen)
+    //  else enqueue and drawEverything
+    
+    var id = setInterval(() => {
+      if (this.enqueue(this.rndGuest(guestArray)) == 'Queue Overflow') {
+        clearInterval(id)
+      } else {
+        this.enqueue(this.rndGuest(guestArray))
+        console.log('new guest in line')
+        this.draw()
+        map.drawEverything(ctx)
+      }
+    }, this.updateRate)
+  } 
 
-
-  drawRndNPC() {
-    //  method to decide randomly which NPC to push into queue
-    //  array of possible guests => randomly drawn index determines guest to draw 
+  //  select random guest to unshift into queue
+  rndGuest(guestArray) {
+    let newGuest = guestArray[Math.floor(Math.random() * (guestArray.length))]
+    return newGuest
   }
+
+  draw() {
+    for (i = 0; i < this.queueControl.length; i++) {
+      if (this.queueControl[i] == Guest) {
+        switch(i) {
+          case 0:
+          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          break
+          case 1:
+          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          break
+          case 2:
+          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          break
+          case 3:
+          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          break
+          case 4:
+          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          break
+        }
+      }
+    }
+  }
+}
 
   /*
   drawRndNPRnr() {
@@ -116,12 +165,3 @@ class Line {
     //  might not be neccessary; this might be a function of genNpcRate; higher genNpcRate => probability of several NPCs appearing in a row increases 
   }
   */
-
-
-
-
-
-
-}
-
-
