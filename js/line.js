@@ -103,14 +103,22 @@ class Line {
     }
   }
 
+
+
   drawRndNPC() {
-    //  method to draw a random NPC to push into queue
+    //  method to decide randomly which NPC to push into queue
+    //  array of possible guests => randomly drawn index determines guest to draw 
   }
 
+  /*
   drawRndNPRnr() {
     //  method to draw a random number of NPCs to push into queue; this must be skewed such as to increase the possibility of drawing 0 or 1 > 2 > 3
     //  might not be neccessary; this might be a function of genNpcRate; higher genNpcRate => probability of several NPCs appearing in a row increases 
   }
+  */
+
+
+
 
 
 

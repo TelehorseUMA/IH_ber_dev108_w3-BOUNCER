@@ -37,6 +37,15 @@ var player = new Bouncer(2, 1, {
   right: '../imgs/bouncer_right.png',
   },tileSize)
 
+
+  
+  //  CREATE guests (new NPC) here
+  //  put guests in guestArray
+  var punkgirl = new Guest(0, 0, '../imgs/guest_punkgirl.png', true)
+  var gayguy = new Guest(0, 0, '../imgs/guest_gayguy.png', true)
+  var businessman = new Guest(0, 0, '../imgs/guest_businessman.png', false)
+
+
 /************************ DRAWING *************************/
 
 /*
@@ -73,12 +82,10 @@ document.onkeydown = function(e) {
   e.preventDefault()
   switch(e.keyCode) {
     case 37:  //  keydown keycode left cursor
-    console.log('left cursor pushed')
     player.moveLeft()
     map.drawEverything(ctx)
     break
     case 39:  // keydown keycode right cursor
-    console.log('right cursor pushed')
     player.moveRight()
     map.drawEverything(ctx)
     break 

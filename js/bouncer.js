@@ -2,20 +2,19 @@ class Bouncer {
   constructor(initialX, initialY, imgPaths, tileSize) {
     this.x = initialX 
     this.y = initialY
+    this.xOnC = this.x*tileSize
+    this.yOnC = this.y*tileSize
     this.view = 'front'
     this.score = 0
     this.reputation = 0
     this.cash = 0
-    this.imgW = tileSize-10
-    this.imgH = tileSize-10
+    this.imgW = tileSize
+    this.imgH = tileSize
     this.imgs = {}  
     for (var view in imgPaths) {
       this.imgs[view] = new Image()
       this.imgs[view].src = imgPaths[view]
     }
-    this.xOnC = this.x*tileSize
-    this.yOnC = this.y*tileSize
-    this.ctx = ctx
   }
     /*
     this.imgLeft = new Image()
@@ -41,17 +40,28 @@ class Bouncer {
 */
 
   moveLeft() {
-    this.x-- 
     this.view = 'left'
+    if (this.x > 0) {
+      this.x--
+      this.xOnC -= 100 
+    }
   }
 
   moveRight() {
-    this.x++
     this.view = 'right'
+    if (this.x < gameBoard[0].length) {
+    this.x++
+    this.xOnC += 100
+    }
   }
 
-  draw(){
+  draw() {
     ctx.drawImage(this.imgs[this.view], this.xOnC, this.yOnC, this.imgW, this.imgH)
+  }
+
+  updatePosition() {
+    this.xOnC = this.x*tileSize
+    this.yOnC = this.y*tileSize
   }
 
 /*

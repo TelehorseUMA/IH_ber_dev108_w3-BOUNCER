@@ -1,17 +1,21 @@
-class NPC {
-  constructor(x, y, img) {
-    this.x = x 
-    this.y = y
-    this.img = img
+class Guest {
+  constructor(initialX, initialY, imgPath, bool) {
+    this.x = initialX 
+    this.y = initialY
+    this.xOnC = this.x * tileSize
+    this.yOnC = this.y * tileSize
+    this.img = new Image()
+    this.img.src = imgPath
+    this.desirable = bool
   }
 
-  moveNPC() {
+  moveGuest() {
     //  only moves on y-axis
     //  decide on interval --> this might better be defined inside the line class
     setInterval()
   }
 
-  pushNPC() {
+  pushGuest() {
     //  pushes an NPC into the bottom of the queue
   }
 }
