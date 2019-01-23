@@ -6,7 +6,7 @@ TYPES OF LINES
 3. VIP line
 ----------------------
 
-1. regular line  [number increases in higher levels]
+1. regular line = 'reg' [number increases in higher levels]
     * slower refresh rate (guests move slower)
     * higher probability of NPCs appearing
     * undesirables only appear in this type of line
@@ -15,7 +15,7 @@ TYPES OF LINES
     * lowest repLossRate
     * lowest repLossVal
 
-2. guestlist line [only one per level]
+2. guestlist line 'gll' [only one per level]
     * higher refresh rate (guests move quicker)
     * lower probability of guests appearing
     * no undesirables appear in this line; gl always get in
@@ -25,7 +25,7 @@ TYPES OF LINES
     * higher repLossRate
     * higher repLossVal
 
-3. VIP line [not graphically marked as a line but invisibly exists between the other lines so VIP               NPCs can appear in unepexpected positions and surprise the player]
+3. VIP line 'vip' [not graphically marked as a line but invisibly exists between the other lines so VIP               NPCs can appear in unepexpected positions and surprise the player]
     * highest refresh rate: VIPs move very quickly
     * lowest probability of appearing; there's only a few per night
     * no undesirables appear in this line; VIPs always get in
@@ -85,10 +85,12 @@ class Line {
     }
   }
 
-  folChecker() {
-    if (this.queueControl[this.queueControl.length-1] !== '') {
+  setFolEmpty() {
+    if (this.queueControl[this.maxLen-1] != undefined) {
+      this.folEmpty = false
       return this.folEmpty = false
     } else {
+      this.folEmpty = true
       return this.folEmpty = true
     }
   }
@@ -106,7 +108,7 @@ class Line {
     if (this.isEmpty() === true) {
       return 'Queue Underflow'  
       //  might be triggered when player moves to an empty line and hits let in/turn away button; does however not trigger any event ingame
-    } else if (this.folEmpty === false && this.lineIndex === player.x) {
+    } else {
       return this.queueControl.pop(e) 
       //  NPC in line position one is removed from line; depending on button press either turn away or let in animation triggered 
     }
@@ -120,19 +122,25 @@ class Line {
     //  else enqueue and drawEverything
     
     var id = setInterval(() => {
-      // if (this.enqueue(this.rndGuest(guestArray)) == 'Queue Overflow') 
-      if (this.canEnqueue === false) { 
-        clearInterval(id)
-        console.log('GAME OVER')
-      } else {
-      // wenn Element auf höchstem index = '' => dequeue } else if {
-        var guestToEnqueue = this.rndGuest(guestArray)
-        // guestToEnqueue.xOnC = this.xOnC
-        // => possible with an if condition to take care of the strings, but not necessary 
-        this.enqueue(guestToEnqueue)
-        console.log('new guest in line')
+      this.setCanEnqueue()
+      console.log(this.canEnqueue)
+      if (this.queueControl[this.maxLen-1] == '') {
+        this.dequeue()
+        console.log('empty string removed')
         this.setCanEnqueue()
         console.log(this.canEnqueue)
+      } else if (this.canEnqueue === false) { 
+        clearInterval(id)
+        console.log('GAME OVER')
+        this.folEmpty = true
+      } else {
+        var guestToEnqueue = this.rndGuest(guestArray)
+        // guestToEnqueue.xOnC = this.xOnC
+        // => possible with an if condition to take care of the  strings, but not necessary 
+        this.enqueue(guestToEnqueue)
+        console.log('new guest in line')
+        this.setFolEmpty()
+        console.log(this.folEmpty)
         // this.enqueue(this.rndGuest(guestArray))
         // this.draw()
         map.drawEverything(ctx)
@@ -146,6 +154,7 @@ class Line {
     return newGuest
   }
 
+  //  draw the queue 
   draw() {
     for (i = 0; i < this.queueControl.length; i++) {
       if (this.queueControl[i] != '') {
@@ -174,6 +183,7 @@ class Line {
   /*
   drawRndNPRnr() {
     //  method to draw a random number of NPCs to push into queue; this must be skewed such as to increase the possibility of drawing 0 or 1 > 2 > 3
-    //  might not be neccessary; this might be a function of genNpcRate; higher genNpcRate => probability of several NPCs appearing in a row increases 
+    //  this can be achieved using might be a function of genNpcRate; higher genNpcRate => probability of several NPCs appearing in a row increases
+    //  might however be fun to implement this; several guests being inserted at one will increase difficulty in higher levels 
   }
   */

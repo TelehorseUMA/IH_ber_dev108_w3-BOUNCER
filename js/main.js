@@ -41,11 +41,12 @@ var player = new Bouncer(2, 1, {
 
 //  NPCs  
 var guestArray = []
-var punkgirl = new Guest(0, 0, '../imgs/guest_punkgirl.png', true)
+
+var punkgirl = new Guest(0, 0, '../imgs/guest_punkgirl.png', true, 50, 20)
 guestArray.push(punkgirl)
-var gayguy = new Guest(0, 0, '../imgs/guest_gayguy.png', true)
+var gayguy = new Guest(0, 0, '../imgs/guest_gayguy.png', true, 50, 20)
 guestArray.push(gayguy)
-var businessman = new Guest(0, 0, '../imgs/guest_businessman.png',false)
+var businessman = new Guest(0, 0, '../imgs/guest_businessman.png',false, -200, 150)
 guestArray.push(businessman)
 
 //  EMPTY LINE ELEMENT
@@ -53,7 +54,10 @@ var empty = ''
 guestArray.push(empty)
 
 /************************ LINES *************************/
-var regLine = new Line(5, 5000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true)
+var lineArray = []
+
+var regLine = new Line(5, 3000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true)
+lineArray.push(regLine)
 
 regLine.update()
 
@@ -87,21 +91,70 @@ var stats = {
   time: 0, // 0 = 11pm; end of party might vary to increase difficulty
 }
 
-/************************ MOVEMENT *************************/
+/************************ MOVEMENT & ACTIONS *************************/
 
 document.onkeydown = function(e) {
   e.preventDefault()
   switch(e.keyCode) {
     case 37:  //  keydown keycode left cursor
     player.moveLeft()
+    /*player.updateStats()*/
     map.drawEverything(ctx)
     break
     case 39:  // keydown keycode right cursor
     player.moveRight()
     map.drawEverything(ctx)
-    break 
+    break
+    case 38: // keydown keycode up cursor
+    // let guest in
+    for (var i = 0; i < lineArray.length; i++) {
+      if (lineArray[i].lineIndex === player.x && lineArray[i].folEmpty === false) {
+        var dequeuedGuest = lineArray[i].dequeue()
+        lineArray[i].setFolEmpty()
+        player.reputation += dequeuedGuest.reputation
+        player.cash += dequeuedGuest.cash
+        if (dequeuedGuest.desirable == true) {
+          switch(lineArray[i].lineType) {
+            case 'reg':
+            player.score += 100
+            break
+            case 'gll':
+            player.score += 250
+            break
+            case 'vip':
+            player.score += 500
+            break
+          }
+        }
+      }
+    }
+    break
+    case 40: // keydown keycode down cursor
+    // turn guest away
+    for (var i = 0; i < lineArray.length; i++) {
+      if (lineArray[i].lineIndex === player.x && lineArray[i].folEmpty === false) {
+        var dequeuedGuest = lineArray[i].dequeue()
+        lineArray[i].setFolEmpty()
+        switch(dequeuedGuest.desirable) {
+          case true: 
+          player.reputation -= dequeuedGuest.reputation
+          break
+          case false:
+          player.reputation += -1*(dequeuedGuest.reputation)
+          player.score += 100
+          break
+        } 
+      }
+    }
+
+
+    // given availability of sprite trigger an animation or if possible trigger sound (one of several sounds might be triggered randomly)
+    // might be nice to also trigger an animation of NPC moving into club + some kind of happy sound 
+    // guest rep and cash values added to player's score
+    // score system: let desirables in => score++; turn desirables away => score++; no penalties otherwise   
   }
 }
+
 document.onkeyup = function(e) {
   e.preventDefault()
   switch(e.keyCode) {
@@ -115,6 +168,23 @@ document.onkeyup = function(e) {
     break
   }
 }
+
+/************************ ACTIONS *************************/
+
+/*
+document.onkeydown = function(e) {
+  e.preventDefault()
+  switch(e.keycode) {
+    
+    case 40: // keydown keycode down cursor
+    //  turn NPC away
+    // given availability of sprite trigger an animation or if possible trigger sound (one of several sounds might be triggered randomly)
+    // might be nice to also trigger an animation of NPC moving away + some kind of unhappy sound 
+    break
+    }
+
+}
+*/
 
 /************************ GAME CONTROL *************************/
 
