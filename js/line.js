@@ -63,6 +63,7 @@ class Line {
     this.frontOfLine.x = tileSize * (colNum - 2)
     */
     this.folEmpty = folEmpty
+    this.canEnqueue = true
   }
   
   isEmpty() {
@@ -73,10 +74,12 @@ class Line {
     }
   }
 
-  canEnqueue() {
+  setCanEnqueue() {
     if (this.queueControl.length < this.maxLen) {
+      this.canEnqueue = true
       return true
     } else {
+      this.canEnqueue = false
       return false
       //  write method to check at regular intervals if this is false; if so: "GAME OVER"
     }
@@ -91,7 +94,7 @@ class Line {
   }
 
   enqueue(e) {  
-    if (this.canEnqueue() === false) {
+    if (this.canEnqueue === false) {
       return 'Queue Overflow' //  this must be used in a game control function to end the game and display 'you lose' info
     } else {
     this.queueControl.unshift(e)
@@ -117,12 +120,21 @@ class Line {
     //  else enqueue and drawEverything
     
     var id = setInterval(() => {
-      if (this.enqueue(this.rndGuest(guestArray)) == 'Queue Overflow') {
+      // if (this.enqueue(this.rndGuest(guestArray)) == 'Queue Overflow') 
+      if (this.canEnqueue === false) { 
         clearInterval(id)
+        console.log('GAME OVER')
       } else {
-        this.enqueue(this.rndGuest(guestArray))
+      // wenn Element auf höchstem index = '' => dequeue } else if {
+        var guestToEnqueue = this.rndGuest(guestArray)
+        // guestToEnqueue.xOnC = this.xOnC
+        // => possible with an if condition to take care of the strings, but not necessary 
+        this.enqueue(guestToEnqueue)
         console.log('new guest in line')
-        this.draw()
+        this.setCanEnqueue()
+        console.log(this.canEnqueue)
+        // this.enqueue(this.rndGuest(guestArray))
+        // this.draw()
         map.drawEverything(ctx)
       }
     }, this.updateRate)
@@ -136,7 +148,7 @@ class Line {
 
   draw() {
     for (i = 0; i < this.queueControl.length; i++) {
-      if (this.queueControl[i] == Guest) {
+      if (this.queueControl[i] != '') {
         switch(i) {
           case 0:
           ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
