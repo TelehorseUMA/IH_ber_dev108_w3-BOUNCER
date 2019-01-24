@@ -81,7 +81,6 @@ class Line {
     } else {
       this.canEnqueue = false
       return false
-      //  write method to check at regular intervals if this is false; if so: "GAME OVER"
     }
   }
 
@@ -125,7 +124,7 @@ class Line {
   shiftEmpty() {
     for (i = this.maxLen-1; i > -1; i--) {
       if (this.queueControl[i] == '') {
-        this.queueControl.unshift(this.queueControl.splice(i, 1))
+        this.queueControl.unshift(this.queueControl.splice(i, 1).join())
         break
       }
     }
@@ -143,29 +142,35 @@ class Line {
       console.log('1. canEnqueue: '+this.canEnqueue)
       this.setFolEmpty()
       console.log('2. folEmpty: '+this.folEmpty)
-      // if (this.queueControl[this.maxLen-1] == '') {
-      //   this.dequeue()
-      //   console.log('empty string removed')
-      // } else 
       if (this.canEnqueue == false && this.queueControl[0] == '') {
+        console.log("# bottom position is empty")
         var newGuest = this.rndGuest(guestArray)
         this.queueControl[0] = newGuest
         console.log('New guest added to end of line')
+        this.setCanEnqueue()
+        console.log('3. canEnqueue: '+this.canEnqueue)
         map.drawEverything(ctx)}
       else if (this.canEnqueue == false && this.queueControl.includes('') == true) {
+        console.log("# some position is empty")
         this.shiftEmpty()
         console.log('EMPTY Shifted')
         this.setFolEmpty()
-        console.log('3. folEmpty: '+this.folEmpty)
+        console.log('4. folEmpty: '+this.folEmpty)
+        this.setCanEnqueue()
+        console.log('5. canEnqueue: '+this.canEnqueue)
         map.drawEverything(ctx)
       } else if (this.canEnqueue == false && this.queueControl.includes('') == false) {
+        console.log("# all queued up")       
         clearInterval(id)
         this.folEmpty = true // stop player from interacting with line
-        console.log('4. folEmpty: '+this.folEmpty)
+        console.log('6. folEmpty: '+this.folEmpty)
         console.log('GAME OVER')
       } else {
         this.enqueueGuest()
         this.setFolEmpty()
+        console.log('7. folEmpty: '+this.folEmpty)
+        this.setCanEnqueue()
+        console.log('8. canEnqueue: '+this.canEnqueue)
         map.drawEverything(ctx)
       }
     }, this.updateRate)

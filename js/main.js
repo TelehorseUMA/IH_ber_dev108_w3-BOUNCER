@@ -56,7 +56,7 @@ guestArray.push(empty)
 /************************ LINES *************************/
 var lineArray = []
 
-var regLine = new Line(5, 3000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true)
+var regLine = new Line(5, 1000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true)
 lineArray.push(regLine)
 
 regLine.update()
@@ -110,7 +110,6 @@ document.onkeydown = function(e) {
     for (var i = 0; i < lineArray.length; i++) {
       if (lineArray[i].lineIndex === player.x && lineArray[i].folEmpty === false) {
         var dequeuedGuest = lineArray[i].dequeue()
-        lineArray[i].setFolEmpty()
         player.reputation += dequeuedGuest.reputation
         player.cash += dequeuedGuest.cash
         if (dequeuedGuest.desirable == true) {
@@ -134,7 +133,6 @@ document.onkeydown = function(e) {
     for (var i = 0; i < lineArray.length; i++) {
       if (lineArray[i].lineIndex === player.x && lineArray[i].folEmpty === false) {
         var dequeuedGuest = lineArray[i].dequeue()
-        lineArray[i].setFolEmpty()
         switch(dequeuedGuest.desirable) {
           case true: 
           player.reputation -= dequeuedGuest.reputation
