@@ -46,7 +46,7 @@ implement queue logic for the lines
 */
 
 class Line {
-  constructor(maxLen, updateRate, repLossNr, repLossRate, repLossVal, maxWait, genNpcRate, queueControl = [], lineIndex, lineType, folEmpty = true) {
+  constructor(maxLen, updateRate, repLossNr, repLossRate, repLossVal, maxWait, genNpcRate, queueControl = [], lineIndex, lineType, folEmpty = true, initialWaitTimeCounter = 0, waitTimeTresh, waitTimePenalty) {
     this.maxLen = maxLen  //  max number of NPCs in line; otherwise queue overflow => player loses
     this.queueControl = queueControl // stores NPCs in line; default is empty, but can be initialized with NPCs already in line
     this.updateRate = updateRate  // interval after which NPCs move up one position in the line; random function triggered to determine whether a new NPC will be pushed into bottom of the line; raise to increase difficulty (higher levels: higher initial update rate, update rate might rise during level)
@@ -64,8 +64,12 @@ class Line {
     */
     this.folEmpty = folEmpty
     this.canEnqueue = true
+    this.waitTimeCounter = initialWaitTimeCounter
+    this.waitTimeTresh = waitTimeTresh
+    this.waitTimePenalty = waitTimePenalty
   }
   
+  /***************** QUEUE LOGIC ******************/
   isEmpty() {
     if (this.queueControl.length === 0) {
       return true
@@ -121,6 +125,7 @@ class Line {
     }
   }
 
+  //  shift empty elements to end of line if line is otherwise filled up
   shiftEmpty() {
     for (i = this.maxLen-1; i > -1; i--) {
       if (this.queueControl[i] == '') {
@@ -130,6 +135,30 @@ class Line {
     }
   }
 
+  //  select random guest to unshift into queue
+  rndGuest(guestArray) {
+    let newGuest = guestArray[Math.floor(Math.random() * (guestArray.length))]
+    return newGuest
+  }
+
+  /***************** STATS ******************/
+
+  updateWTcounter() {
+    if (this.folEmpty == false) {
+      this.waitTimeCounter++
+    } else {
+      this.waitTimeCounter = 0
+    }
+  }
+
+  getPenalty() {
+    if (this.folEmpty == false && this.waitTimeCounter >= this.waitTimeTresh) {
+      player.reputation -= this.waitTimePenalty
+    }
+  }
+
+
+  /***************** UPDATE FUNCTION ******************/
   update() {
     //  use setInterval to retrigger according to line's updateRate
     //  use rndGuest to randomly select guest or empty string from guest array
@@ -142,6 +171,9 @@ class Line {
       console.log('1. canEnqueue: '+this.canEnqueue)
       this.setFolEmpty()
       console.log('2. folEmpty: '+this.folEmpty)
+      this.updateWTcounter()
+      this.getPenalty()
+      console.log('3. WTC updated: '+this.waitTimeCounter)
       if (this.canEnqueue == false && this.queueControl[0] == '') {
         console.log("# bottom position is empty")
         var newGuest = this.rndGuest(guestArray)
@@ -176,11 +208,8 @@ class Line {
     }, this.updateRate)
   } 
 
-  //  select random guest to unshift into queue
-  rndGuest(guestArray) {
-    let newGuest = guestArray[Math.floor(Math.random() * (guestArray.length))]
-    return newGuest
-  }
+  
+  /***************** DRAW FUNCTION ******************/
 
   //  draw the queue 
   draw() {
