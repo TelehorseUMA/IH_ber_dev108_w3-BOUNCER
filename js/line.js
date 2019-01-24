@@ -104,6 +104,14 @@ class Line {
     }
   }
 
+  enqueueGuest() {
+    var guestToEnqueue = this.rndGuest(guestArray)
+    // guestToEnqueue.xOnC = this.xOnC
+    // => possible with an if condition to take care of the  strings, but not necessary 
+    this.enqueue(guestToEnqueue)
+    console.log('new guest in line')
+  }
+
   dequeue(e) {  //  =>  is triggered in two instances: 1. player lets guest in / 2. player turns guest away
     if (this.isEmpty() === true) {
       return 'Queue Underflow'  
@@ -111,6 +119,15 @@ class Line {
     } else {
       return this.queueControl.pop(e) 
       //  NPC in line position one is removed from line; depending on button press either turn away or let in animation triggered 
+    }
+  }
+
+  shiftEmpty() {
+    for (i = this.maxLen-1; i > -1; i--) {
+      if (this.queueControl[i] == '') {
+        this.queueControl.unshift(this.queueControl.splice(i, 1))
+        break
+      }
     }
   }
 
@@ -123,26 +140,32 @@ class Line {
     
     var id = setInterval(() => {
       this.setCanEnqueue()
-      console.log(this.canEnqueue)
-      if (this.queueControl[this.maxLen-1] == '') {
-        this.dequeue()
-        console.log('empty string removed')
-        this.setCanEnqueue()
-        console.log(this.canEnqueue)
-      } else if (this.canEnqueue === false) { 
-        clearInterval(id)
-        console.log('GAME OVER')
-        this.folEmpty = true
-      } else {
-        var guestToEnqueue = this.rndGuest(guestArray)
-        // guestToEnqueue.xOnC = this.xOnC
-        // => possible with an if condition to take care of the  strings, but not necessary 
-        this.enqueue(guestToEnqueue)
-        console.log('new guest in line')
+      console.log('1. canEnqueue: '+this.canEnqueue)
+      this.setFolEmpty()
+      console.log('2. folEmpty: '+this.folEmpty)
+      // if (this.queueControl[this.maxLen-1] == '') {
+      //   this.dequeue()
+      //   console.log('empty string removed')
+      // } else 
+      if (this.canEnqueue == false && this.queueControl[0] == '') {
+        var newGuest = this.rndGuest(guestArray)
+        this.queueControl[0] = newGuest
+        console.log('New guest added to end of line')
+        map.drawEverything(ctx)}
+      else if (this.canEnqueue == false && this.queueControl.includes('') == true) {
+        this.shiftEmpty()
+        console.log('EMPTY Shifted')
         this.setFolEmpty()
-        console.log(this.folEmpty)
-        // this.enqueue(this.rndGuest(guestArray))
-        // this.draw()
+        console.log('3. folEmpty: '+this.folEmpty)
+        map.drawEverything(ctx)
+      } else if (this.canEnqueue == false && this.queueControl.includes('') == false) {
+        clearInterval(id)
+        this.folEmpty = true // stop player from interacting with line
+        console.log('4. folEmpty: '+this.folEmpty)
+        console.log('GAME OVER')
+      } else {
+        this.enqueueGuest()
+        this.setFolEmpty()
         map.drawEverything(ctx)
       }
     }, this.updateRate)
