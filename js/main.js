@@ -8,7 +8,7 @@ bg2.src = '../imgs/newfloor.png'
 var audio = new Audio('../sounds/Feed Forward-003-Sandwell District-Immolare (Function Version).mp3');
 
 
-window.onload = playAudio()
+let test = playAudio()
 
 function playAudio() {
   var audio = new Audio('../sounds/Feed Forward-003-Sandwell District-Immolare (Function Version).mp3');
@@ -89,13 +89,13 @@ guestArray.push(empty)
 /************************ LINES *************************/
 var lineArray = []
 
-var regLine = new Line(5, 3000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true, 0, 2, 50)
+var regLine = new Line(5, 3500, 3, 3000, 20, 6000, 1, [], 1, 'reg', true, 0, 2, 50)
 lineArray.push(regLine)
 
-var regLine2 = new Line(5, 2500, 3, 3000, 20, 6000, 1, [], 3, 'reg', true, 0, 2, 50)
+var regLine2 = new Line(5, 2750, 3, 3000, 20, 6000, 1, [], 3, 'reg', true, 0, 2, 50)
 lineArray.push(regLine2)
 
-var quickLine = new Line(5, 2000, 3, 3000, 20, 6000, 1, [], 5, 'reg', true, 0, 2, 50)
+var quickLine = new Line(5, 2250, 3, 3000, 20, 6000, 1, [], 5, 'reg', true, 0, 2, 50)
 lineArray.push(quickLine)
 
 regLine.update()
