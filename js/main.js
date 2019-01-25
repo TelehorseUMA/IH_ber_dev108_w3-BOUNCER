@@ -56,7 +56,7 @@ guestArray.push(empty)
 /************************ LINES *************************/
 var lineArray = []
 
-var regLine = new Line(5, 1000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true)
+var regLine = new Line(5, 2000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true, 0, 2, 50)
 lineArray.push(regLine)
 
 regLine.update()

@@ -46,7 +46,7 @@ implement queue logic for the lines
 */
 
 class Line {
-  constructor(maxLen, updateRate, repLossNr, repLossRate, repLossVal, maxWait, genNpcRate, queueControl = [], lineIndex, lineType, folEmpty = true, initialWaitTimeCounter = 0, waitTimeTresh, waitTimePenalty) {
+  constructor(maxLen, updateRate, repLossNr, repLossRate, repLossVal, maxWait, genNpcRate, queueControl = [], lineIndex, lineType, folEmpty = true, initialWaitTimeCounter, waitTimeTresh, waitTimePenalty) {
     this.maxLen = maxLen  //  max number of NPCs in line; otherwise queue overflow => player loses
     this.queueControl = queueControl // stores NPCs in line; default is empty, but can be initialized with NPCs already in line
     this.updateRate = updateRate  // interval after which NPCs move up one position in the line; random function triggered to determine whether a new NPC will be pushed into bottom of the line; raise to increase difficulty (higher levels: higher initial update rate, update rate might rise during level)
@@ -146,14 +146,17 @@ class Line {
   updateWTcounter() {
     if (this.folEmpty == false) {
       this.waitTimeCounter++
+      console.log('Wait time added: '+this.waitTimeCounter)
     } else {
       this.waitTimeCounter = 0
+      console.log('Wait time nulled: '+this.waitTimeCounter)
     }
   }
 
   getPenalty() {
     if (this.folEmpty == false && this.waitTimeCounter >= this.waitTimeTresh) {
       player.reputation -= this.waitTimePenalty
+      console.log('Penalty given: '+player.reputation)
     }
   }
 
@@ -173,7 +176,6 @@ class Line {
       console.log('2. folEmpty: '+this.folEmpty)
       this.updateWTcounter()
       this.getPenalty()
-      console.log('3. WTC updated: '+this.waitTimeCounter)
       if (this.canEnqueue == false && this.queueControl[0] == '') {
         console.log("# bottom position is empty")
         var newGuest = this.rndGuest(guestArray)
