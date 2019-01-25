@@ -1,5 +1,22 @@
 body {
-  background-image: url('./Berghain-night.jpg');
+  margin: 0;
+}
+
+.container {
+  background-image: url('./imgs/berghain2.jpg');
   background-position: center;
   background-size:cover;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
 }

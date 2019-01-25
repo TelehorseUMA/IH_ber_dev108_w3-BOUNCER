@@ -28,6 +28,13 @@ class Map {
     drawBoard(gameBoard)  
     player.draw()
     regLine.draw()
+    regLine2.draw()
+    quickLine.draw()
+    if (player.isGO == true) {
+      var goImg = new Image()
+        goImg.src = '../imgs/gameover.png'
+        ctx.drawImage(goImg, 100, 200, 500, 300)
+    }
     // TODO: for each queue, draw the queue
   }
 

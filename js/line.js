@@ -197,8 +197,12 @@ class Line {
         console.log("# all queued up")       
         clearInterval(id)
         this.folEmpty = true // stop player from interacting with line
+        player.isGO = true
         console.log('6. folEmpty: '+this.folEmpty)
         console.log('GAME OVER')
+        var goImg = new Image()
+        goImg.src = '../imgs/gameover.png'
+        ctx.drawImage(goImg, 200, 200, 150, 100)
       } else {
         this.enqueueGuest()
         this.setFolEmpty()
@@ -233,6 +237,14 @@ class Line {
           case 4:
           ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
           break
+          /*
+          case 5:
+          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          break
+          case 6:
+          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          break
+          */
         }
       }
     }

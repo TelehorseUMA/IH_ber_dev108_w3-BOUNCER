@@ -2,17 +2,31 @@ var canvas = document.getElementById('canv')
 ctx = canvas.getContext('2d')
 var tileSize = 100
 
+var bg2 = new Image()
+bg2.src = '../imgs/newfloor.png'
+
+var audio = new Audio('../sounds/Feed Forward-003-Sandwell District-Immolare (Function Version).mp3');
+
+
+window.onload = playAudio()
+
+function playAudio() {
+  var audio = new Audio('../sounds/Feed Forward-003-Sandwell District-Immolare (Function Version).mp3');
+audio.play();
+}
+
+
 /************************ GAME BOARD *************************/
 //  1.  simple map for test purposese
 
 gameBoard = [
-  [ , , , , ],
-  [ , , , , ],
-  [ , , , , ],
-  [ , , , , ],
-  [ , , , , ],
-  [ , , , , ],
-  [ , , , , ],
+  [ , , , , , , ],
+  [ , , , , , , ],
+  [ , , , , , , ],
+  [ , , , , , , ],
+  [ , , , , , , ],
+  [ , , , , , , ],
+  [ , , , , , , ],
 ]
 
 function drawBoard(twoDimArray) {
@@ -21,6 +35,13 @@ function drawBoard(twoDimArray) {
       ctx.strokeRect(j*tileSize, i*tileSize, tileSize, tileSize)
     }
   }
+  var bg1 = new Image()
+  bg1.src = '../imgs/club.png'
+  ctx.drawImage(bg1, 0, 0, 700, 200)
+  
+  var bg2 = new Image()
+  bg2.src = '../imgs/newfloor.png'
+  ctx.drawImage(bg2, 0, 200, 700, 500)
 }
 
 drawBoard(gameBoard)
@@ -34,20 +55,32 @@ drawBoard(gameBoard)
 //  PLAYER
 
 var player = new Bouncer(2, 1, {
-  front:  '../imgs/bouncer_front.png',
-  left:   '../imgs/bouncer_left.png',
-  right: '../imgs/bouncer_right.png',
+  front:  '../imgs/bouncer2.png',
+  left:   '../imgs/bouncer2_left.png',
+  right: '../imgs/bouncer2_right.png',
 },tileSize)
 
 //  NPCs  
 var guestArray = []
 
-var punkgirl = new Guest(0, 0, '../imgs/guest_punkgirl.png', true, 50, 20)
+var punkgirl = new Guest(0, 0, '../imgs/punkgirl2.png', true, 50, 20)
 guestArray.push(punkgirl)
-var gayguy = new Guest(0, 0, '../imgs/guest_gayguy.png', true, 50, 20)
+var gayguy = new Guest(0, 0, '../imgs/gayguy.png', true, 50, 20)
 guestArray.push(gayguy)
-var businessman = new Guest(0, 0, '../imgs/guest_businessman.png',false, -200, 150)
+var businessman = new Guest(0, 0, '../imgs/businessman2.png',false, -200, 150)
 guestArray.push(businessman)
+var  bikinigirl = new Guest(0, 0, '../imgs/bikinigirl.png', true, 50, 30)
+guestArray.push(bikinigirl)
+var tourist = new Guest(0, 0, '../imgs/tourists.png', false, -100, 75)
+guestArray.push(tourist)
+var otherBusinessman = new Guest(0, 0, '../imgs/businessman3.png', false, -200, 200)
+guestArray.push(otherBusinessman)
+var blackdude = new Guest(0, 0, '../imgs/blackdude.png', true, 50, 50)
+guestArray.push(blackdude)
+var bigguy = new Guest(0, 0, '../imgs/bigguy.png', false, -150, 50)
+guestArray.push(bigguy)
+
+
 
 //  EMPTY LINE ELEMENT
 var empty = ''
@@ -56,10 +89,19 @@ guestArray.push(empty)
 /************************ LINES *************************/
 var lineArray = []
 
-var regLine = new Line(5, 2000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true, 0, 2, 50)
+var regLine = new Line(5, 3000, 3, 3000, 20, 6000, 1, [], 1, 'reg', true, 0, 2, 50)
 lineArray.push(regLine)
 
+var regLine2 = new Line(5, 2500, 3, 3000, 20, 6000, 1, [], 3, 'reg', true, 0, 2, 50)
+lineArray.push(regLine2)
+
+var quickLine = new Line(5, 2000, 3, 3000, 20, 6000, 1, [], 5, 'reg', true, 0, 2, 50)
+lineArray.push(quickLine)
+
 regLine.update()
+regLine2.update()
+quickLine.update()
+
 
 /************************ DRAWING *************************/
 
@@ -192,7 +234,7 @@ document.onkeydown = function(e) {
 
 /************************ ANIMATION *************************/
 
-var map = new Map(100, 5, 7)
+var map = new Map(100, 7, 7)
 
 function animation() {
   map.update()
@@ -200,3 +242,24 @@ function animation() {
   window.requestAnimationFrame(animation)
 }
 animation()
+
+/************************ CANVAS RESIZE *************************/
+
+
+function resize() {
+  // Resize the window, not the pen
+  // Our canvas must cover full height of screen
+  // regardless of the resolution
+  var height = window.innerHeight;
+
+  // So we need to calculate the proper scaled width
+  // that should work well with every resolution
+  var ratio = canvas.width / canvas.height;
+  var width = height * ratio;
+
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+}
+
+window.addEventListener('load', resize, false);
+window.addEventListener('resize', resize, false);

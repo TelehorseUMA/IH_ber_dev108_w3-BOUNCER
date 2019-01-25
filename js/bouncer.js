@@ -15,6 +15,7 @@ class Bouncer {
       this.imgs[view] = new Image()
       this.imgs[view].src = imgPaths[view]
     }
+    this.isGo = false
     /*this.whichLine =*/ 
   }
 
