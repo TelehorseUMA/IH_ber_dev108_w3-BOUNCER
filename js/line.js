@@ -36,20 +36,13 @@ TYPES OF LINES
     * maximum repLossVal  
     
 ----------------------
-
-LOGIC
-----------------------
-implement queue logic for the lines
-=>  NPCs get pushed to bottom of the line, then move up
-=>  is it possible to insert empty fields over which NPCs can later move or is a different movement logic neccesary?
-----------------------
 */
 
 class Line {
   constructor(maxLen, updateRate, repLossNr, repLossRate, repLossVal, maxWait, genNpcRate, queueControl = [], lineIndex, lineType, folEmpty = true, initialWaitTimeCounter, waitTimeTresh, waitTimePenalty) {
     this.maxLen = maxLen  //  max number of NPCs in line; otherwise queue overflow => player loses
     this.queueControl = queueControl // stores NPCs in line; default is empty, but can be initialized with NPCs already in line
-    this.updateRate = updateRate  // interval after which NPCs move up one position in the line; random function triggered to determine whether a new NPC will be pushed into bottom of the line; raise to increase difficulty (higher levels: higher initial update rate, update rate might rise during level)
+    this.updateRate = updateRate  // interval after which NPCs move up one position in the line; raise to increase difficulty (higher levels: higher initial update rate, update rate might rise during level)
     this.repLossNr = repLossNr // treshold of number of guests in the line; if crossed player loses reputation
     this.repLossRate = repLossRate // interval of reputation loss  once conditions are met (repLossTr reached; etc.)
     this.repLossVal = repLossVal // amount of reputation player loses at repLossRate once conditions are met
@@ -79,23 +72,12 @@ class Line {
   }
 
   setCanEnqueue() {
-    if (this.queueControl.length < this.maxLen) {
-      this.canEnqueue = true
-      return true
-    } else {
-      this.canEnqueue = false
-      return false
-    }
+    this.queueControl.length < this.maxLen ? this.canEnqueue = true : this.canEnqueue = false
+		console.log('TCL: Line -> setCanEnqueue -> this.canEnqueue', this.canEnqueue)
   }
 
   setFolEmpty() {
-    if (this.queueControl[this.maxLen-1] != undefined) {
-      this.folEmpty = false
-      return this.folEmpty = false
-    } else {
-      this.folEmpty = true
-      return this.folEmpty = true
-    }
+    this.queueControl[this.maxLen-1] != false ? this.folEmpty = false : this.folEmpty = true
   }
 
   enqueue(e) {  
@@ -112,11 +94,13 @@ class Line {
     // guestToEnqueue.xOnC = this.xOnC
     // => possible with an if condition to take care of the  strings, but not necessary 
     this.enqueue(guestToEnqueue)
-    console.log('new guest in line')
+    console.log('DEBUG: new guest in line: ', guestToEnqueue)
   }
 
+  //  this method has to be disabled when there is no guest in top of line position
   dequeue(e) {  //  =>  is triggered in two instances: 1. player lets guest in / 2. player turns guest away
     if (this.isEmpty() === true) {
+      console.log('DEBUG: Queue underflow: trying to dequeue empty queue.')
       return 'Queue Underflow'  
       //  might be triggered when player moves to an empty line and hits let in/turn away button; does however not trigger any event ingame
     } else {
@@ -127,7 +111,7 @@ class Line {
 
   //  shift empty elements to end of line if line is otherwise filled up
   shiftEmpty() {
-    for (i = this.maxLen-1; i > -1; i--) {
+    for (let i = this.maxLen-1; i > -1; i--) {
       if (this.queueControl[i] == '') {
         this.queueControl.unshift(this.queueControl.splice(i, 1).join())
         break
@@ -162,90 +146,98 @@ class Line {
 
 
   /***************** UPDATE FUNCTION ******************/
-  update() {
+ 
     //  use setInterval to retrigger according to line's updateRate
     //  use rndGuest to randomly select guest or empty string from guest array
     //  use enqueue to unshift guest into line
-    //  if enqueue returns Queue overflow => GAME OVER (clear             interval; halt movements; display GAME OVER Screen)
+    //  if enqueue returns Queue overflow => GAME OVER (clear interval; halt movements; display GAME OVER Screen)
     //  else enqueue and drawEverything
+
+    //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  do not use set interval
+    //  instead: line refreshes as a function of window.requestAnimationFrame;
+    //  lines have refresh rates that are set as numbers of frames; each update of the canvas raises frame counter; lines update every time respective number of frames has passed
+    //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
-    var id = setInterval(() => {
+    
+  update() {
+  var id = setInterval(() => {
+  
+    this.setCanEnqueue()
+    console.log('1. canEnqueue: '+this.canEnqueue)
+    this.setFolEmpty()
+    console.log('2. folEmpty: '+this.folEmpty)
+    this.updateWTcounter()
+    this.getPenalty()
+    if (this.canEnqueue == false && this.queueControl[0] == '') {
+      console.log("# bottom position is empty")
+      var newGuest = this.rndGuest(guestArray)
+      this.queueControl[0] = newGuest
+      console.log('New guest added to end of line')
       this.setCanEnqueue()
-      console.log('1. canEnqueue: '+this.canEnqueue)
+      console.log('3. canEnqueue: '+this.canEnqueue)
+      map.drawEverything(ctx)}
+    else if (this.canEnqueue == false && this.queueControl.includes('') == true) {
+      console.log("# some position is empty")
+      this.shiftEmpty()
+      console.log('EMPTY Shifted')
       this.setFolEmpty()
-      console.log('2. folEmpty: '+this.folEmpty)
-      this.updateWTcounter()
-      this.getPenalty()
-      if (this.canEnqueue == false && this.queueControl[0] == '') {
-        console.log("# bottom position is empty")
-        var newGuest = this.rndGuest(guestArray)
-        this.queueControl[0] = newGuest
-        console.log('New guest added to end of line')
-        this.setCanEnqueue()
-        console.log('3. canEnqueue: '+this.canEnqueue)
-        map.drawEverything(ctx)}
-      else if (this.canEnqueue == false && this.queueControl.includes('') == true) {
-        console.log("# some position is empty")
-        this.shiftEmpty()
-        console.log('EMPTY Shifted')
-        this.setFolEmpty()
-        console.log('4. folEmpty: '+this.folEmpty)
-        this.setCanEnqueue()
-        console.log('5. canEnqueue: '+this.canEnqueue)
-        map.drawEverything(ctx)
-      } else if (this.canEnqueue == false && this.queueControl.includes('') == false) {
-        console.log("# all queued up")       
-        clearInterval(id)
-        this.folEmpty = true // stop player from interacting with line
-        player.isGO = true
-        console.log('6. folEmpty: '+this.folEmpty)
-        console.log('GAME OVER')
-        var goImg = new Image()
-        goImg.src = '../imgs/gameover.png'
-        ctx.drawImage(goImg, 200, 200, 150, 100)
-      } else {
-        this.enqueueGuest()
-        this.setFolEmpty()
-        console.log('7. folEmpty: '+this.folEmpty)
-        this.setCanEnqueue()
-        console.log('8. canEnqueue: '+this.canEnqueue)
-        map.drawEverything(ctx)
-      }
-    }, this.updateRate)
-  } 
+      console.log('4. folEmpty: '+this.folEmpty)
+      this.setCanEnqueue()
+      console.log('5. canEnqueue: '+this.canEnqueue)
+      map.drawEverything(ctx)
+    } else if (this.canEnqueue == false && this.queueControl.includes('') == false) {
+      console.log("# all queued up")       
+      clearInterval(id)
+      this.folEmpty = true // stop player from interacting with line
+      player.isGO = true
+      console.log('6. folEmpty: '+this.folEmpty)
+      console.log('GAME OVER')
+      var goImg = new Image()
+      goImg.src = './imgs/gameover.png'
+      ctx.drawImage(goImg, 200, 200, 150, 100)
+    } else {
+      this.enqueueGuest()
+      this.setFolEmpty()
+      console.log('7. folEmpty: '+this.folEmpty)
+      this.setCanEnqueue()
+      console.log('8. canEnqueue: '+this.canEnqueue)
+      map.drawEverything(ctx)
+    }
+  }, this.updateRate)
+} 
 
   
   /***************** DRAW FUNCTION ******************/
 
   //  draw the queue 
   draw() {
-    for (i = 0; i < this.queueControl.length; i++) {
+    for (let i = 0; i < this.queueControl.length; i++) {
       if (this.queueControl[i] != '') {
         switch(i) {
           case 0:
           ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          console.log(`DEBUG -- DRAWING LINE -- : looping over index ${i}, drawing: `, this.queueControl[i])
           break
           case 1:
           ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          console.log(`DEBUG -- DRAWING LINE -- : looping over index ${i}, drawing: `, this.queueControl[i])
           break
           case 2:
           ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          console.log(`DEBUG -- DRAWING LINE -- : looping over index ${i}, drawing: `, this.queueControl[i])
           break
           case 3:
           ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          console.log(`DEBUG -- DRAWING LINE -- : looping over index ${i}, drawing: `, this.queueControl[i])
           break
           case 4:
           ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
+          console.log(`DEBUG -- DRAWING LINE -- : looping over index ${i}, drawing: `, this.queueControl[i])
           break
-          /*
-          case 5:
-          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
-          break
-          case 6:
-          ctx.drawImage(this.queueControl[i].img, this.xOnC, (gameBoard.length*100)-(tileSize*(i+1)), tileSize, tileSize)
-          break
-          */
         }
+      } else {
+        console.log(`DEBUG -- DRAWING LINE -- : looping over empty element at index ${i}, nothing drawn.`, this.queueControl[i])
       }
     }
   }

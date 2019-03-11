@@ -2,8 +2,9 @@ var canvas = document.getElementById('canv')
 ctx = canvas.getContext('2d')
 var tileSize = 100
 
-var bg2 = new Image()
-bg2.src = '../imgs/newfloor.png'
+let globalTimer = 0
+//  =>  ++ whenever new draw everyhing is triggered by request animation frame
+//  =>  global timer nulled after certain amount of time elapses; hour timer ++; hour timer is displayed to user and shows the progression of the night
 
 var audio = new Audio('../sounds/Feed Forward-003-Sandwell District-Immolare (Function Version).mp3');
 
@@ -36,11 +37,11 @@ function drawBoard(twoDimArray) {
     }
   }
   var bg1 = new Image()
-  bg1.src = '../imgs/club.png'
+  bg1.src = './imgs/club.png'
   ctx.drawImage(bg1, 0, 0, 700, 200)
   
   var bg2 = new Image()
-  bg2.src = '../imgs/newfloor.png'
+  bg2.src = './imgs/newfloor.png'
   ctx.drawImage(bg2, 0, 200, 700, 500)
 }
 
@@ -53,34 +54,35 @@ drawBoard(gameBoard)
 /************************ CHARS *************************/
 
 //  PLAYER
+var player = new Bouncer(2, 1, 
+  {
+  front:  './imgs/bouncer2.png',
+  left:   './imgs/bouncer2_left.png',
+  right: './imgs/bouncer2_right.png',  
+  },
+  tileSize
+)
 
-var player = new Bouncer(2, 1, {
-  front:  '../imgs/bouncer2.png',
-  left:   '../imgs/bouncer2_left.png',
-  right: '../imgs/bouncer2_right.png',
-},tileSize)
 
 //  NPCs  
 var guestArray = []
 
-var punkgirl = new Guest(0, 0, '../imgs/punkgirl2.png', true, 50, 20)
+const punkgirl = new Guest(0, 0, './imgs/punkgirl2.png', true, 50, 20)
 guestArray.push(punkgirl)
-var gayguy = new Guest(0, 0, '../imgs/gayguy.png', true, 50, 20)
+const gayguy = new Guest(0, 0, './imgs/gayguy.png', true, 50, 20)
 guestArray.push(gayguy)
-var businessman = new Guest(0, 0, '../imgs/businessman2.png',false, -200, 150)
+const businessman = new Guest(0, 0, './imgs/businessman2.png', false, -200, 150)
 guestArray.push(businessman)
-var  bikinigirl = new Guest(0, 0, '../imgs/bikinigirl.png', true, 50, 30)
+const  bikinigirl = new Guest(0, 0, './imgs/bikinigirl.png', true, 50, 30)
 guestArray.push(bikinigirl)
-var tourist = new Guest(0, 0, '../imgs/tourists.png', false, -100, 75)
+const tourist = new Guest(0, 0, './imgs/tourists.png', false, -100, 75)
 guestArray.push(tourist)
-var otherBusinessman = new Guest(0, 0, '../imgs/businessman3.png', false, -200, 200)
+const otherBusinessman = new Guest(0, 0, './imgs/businessman3.png', false, -200, 200)
 guestArray.push(otherBusinessman)
-var blackdude = new Guest(0, 0, '../imgs/blackdude.png', true, 50, 50)
+const blackdude = new Guest(0, 0, './imgs/blackdude.png', true, 50, 50)
 guestArray.push(blackdude)
-var bigguy = new Guest(0, 0, '../imgs/bigguy.png', false, -150, 50)
+const bigguy = new Guest(0, 0, './imgs/bigguy.png', false, -150, 50)
 guestArray.push(bigguy)
-
-
 
 //  EMPTY LINE ELEMENT
 var empty = ''
@@ -98,6 +100,8 @@ lineArray.push(regLine2)
 var quickLine = new Line(5, 2250, 3, 3000, 20, 6000, 1, [], 5, 'reg', true, 0, 2, 50)
 lineArray.push(quickLine)
 
+// tie updating of lines to draw everything function/request animation frame => lines only update after certain number of refreshes 
+// if request animation frame = 60fps => line refresh rate of 5 resulst in line being refreshed 12 times every second
 regLine.update()
 regLine2.update()
 quickLine.update()
@@ -148,7 +152,7 @@ document.onkeydown = function(e) {
     map.drawEverything(ctx)
     break
     case 38: // keydown keycode up cursor
-    // let guest in
+    // admit guest
     for (var i = 0; i < lineArray.length; i++) {
       if (lineArray[i].lineIndex === player.x && lineArray[i].folEmpty === false) {
         var dequeuedGuest = lineArray[i].dequeue()
@@ -232,15 +236,40 @@ document.onkeydown = function(e) {
 //  * trigger events: player winning / player losing 
 
 
-/************************ ANIMATION *************************/
+/************************ DRAWING & ANIMATION *************************/
 
-var map = new Map(100, 7, 7)
+// var map = new Map(100, 7, 7)
+
+function drawEverything() {
+  ctx.clearRect(0, 0, gameBoard[0].length * tileSize, gameBoard.length * tileSize)
+  /*
+  this.drawGrid(this.tileSize, this.nrOfTilesX, this.nrOfTilesY)
+  */
+  drawBoard(gameBoard)  
+  player.draw()
+  regLine.draw()
+  regLine2.draw()
+  quickLine.draw()
+  if (player.isGO == true) {
+    var goImg = new Image()
+      goImg.src = './imgs/gameover.png'
+      ctx.drawImage(goImg, 100, 200, 500, 300)
+  }
+}
 
 function animation() {
-  map.update()
-  map.drawEverything(ctx)
+  // map.update()
+  drawEverything()
+  globalTimer++
+  console.log('TCL: animation -> globalTimer', globalTimer)
+  // if (player.isGO == true) {
+  //   console.log('GAME OVER')
+  //   break
+  // }  
+  // else {
   window.requestAnimationFrame(animation)
-}
+  }  
+
 animation()
 
 /************************ CANVAS RESIZE *************************/
